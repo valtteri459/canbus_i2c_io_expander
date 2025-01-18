@@ -81,7 +81,7 @@ unsigned char rxBuf[8];
 #define BTN2 6
 #define BTN3 5
 
-#define DEBOUNCE_LOOPS 30
+#define DEBOUNCE_LOOPS 50
 //if input is high, these are always set to value defined in DEBOUNCE_LOOPS, and when input is low they will slowly decay to 0 = off
 
 unsigned int DPI0in = 0;                   // storage for digital input value as number for debounce purposes
@@ -213,9 +213,6 @@ void canRead() {
     //Volt
     Volt = ((int)rxBuf[1] << 8) | rxBuf[0]; //scale 100x
 
-    //BaroPress
-    BoostPressure = ((int)rxBuf[3] << 8) | rxBuf[2]; //scale 10x
-
     //IntakeTemp
     IntakeTemp = ((int)rxBuf[5] << 8) | rxBuf[4]; //scale 10x
 
@@ -224,9 +221,9 @@ void canRead() {
   
   } else if (rxId == 0x537) {
     FuelPressure = ((int)rxBuf[1] << 8) | rxBuf[0]; //scale 10x
-  } else if (rxId == 0x527) {
-    Lambda = ((int)rxBuf[1] << 8) | rxBuf[0]; //scale 1000x
   } else if (rxId == 0x520) {
+    BoostPressure = ((int)rxBuf[5] << 8) | rxBuf[4]; //scale 10x
+    Lambda = ((int)rxBuf[7] << 8) | rxBuf[6]; //scale 1000x
     RPM = ((int)rxBuf[1] << 8) | rxBuf[0];
   } else if (rxId == 0x536) {
     OilPressure = ((int)rxBuf[5] << 8) | rxBuf[4]; //scale 10x
@@ -255,7 +252,7 @@ void SendDPIValues()
   
   //add/remove the /* from the following row to enable or disable button debug squares from bottom right of screen
   
-  lcd.setCursor(16,3);
+  lcd.setCursor(15,3);
   lcd.write(DPI0in > 0 ? 5 : 0);
   lcd.write(DPI1in > 0 ? 5 : 0);
   lcd.write(DPI2in > 0 ? 5 : 0);
