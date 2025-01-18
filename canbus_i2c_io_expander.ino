@@ -252,6 +252,15 @@ void SendDPIValues()
   DPI1in = digitalRead(BTN1) ? DEBOUNCE_LOOPS : 0;
   DPI2in = digitalRead(BTN2) ? DEBOUNCE_LOOPS : 0;
   DPI3in = digitalRead(BTN3) ? DEBOUNCE_LOOPS : 0;
+  
+  //add/remove the /* from the following row to enable or disable button debug squares from bottom right of screen
+  
+  lcd.setCursor(16,3);
+  lcd.write(DPI0in > 0 ? 5 : 0);
+  lcd.write(DPI1in > 0 ? 5 : 0);
+  lcd.write(DPI2in > 0 ? 5 : 0);
+  lcd.write(DPI3in > 0 ? 5 : 0);
+  //**/
 
   if(DPI0in > 0) { 
     DPI0in--;
