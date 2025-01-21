@@ -81,7 +81,7 @@ unsigned char rxBuf[8];
 #define BTN2 6
 #define BTN3 5
 
-#define DEBOUNCE_LOOPS 64
+#define DEBOUNCE_LOOPS 16
 //if input is high, these are always set to value defined in DEBOUNCE_LOOPS, and when input is low they will slowly decay to 0 = off
 
 unsigned int DPI0in = 0;                   // storage for digital input value as number for debounce purposes
@@ -245,10 +245,10 @@ void SendDPIValues()
 {
   byte DPIdata0[8];
 
-  DPI0in = digitalRead(BTN0) ? DEBOUNCE_LOOPS : 0;
-  DPI1in = digitalRead(BTN1) ? DEBOUNCE_LOOPS : 0;
-  DPI2in = digitalRead(BTN2) ? DEBOUNCE_LOOPS : 0;
-  DPI3in = digitalRead(BTN3) ? DEBOUNCE_LOOPS : 0;
+  DPI0in = digitalRead(BTN0) ? DEBOUNCE_LOOPS : DPI0in;
+  DPI1in = digitalRead(BTN1) ? DEBOUNCE_LOOPS : DPI1in;
+  DPI2in = digitalRead(BTN2) ? DEBOUNCE_LOOPS : DPI2in;
+  DPI3in = digitalRead(BTN3) ? DEBOUNCE_LOOPS : DPI3in;
   
   //add/remove the /* from the following row to enable or disable button debug squares from bottom right of screen
   
@@ -257,6 +257,8 @@ void SendDPIValues()
   lcd.write(DPI1in > 0 ? 5 : 0);
   lcd.write(DPI2in > 0 ? 5 : 0);
   lcd.write(DPI3in > 0 ? 5 : 0);
+  //lcd.print(DPI0in);
+  //lcd.print("   ");
   //**/
 
   if(DPI0in > 0) { 
