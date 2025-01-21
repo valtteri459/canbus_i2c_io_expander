@@ -66,6 +66,16 @@ uint8_t five[] = {
   B11111
 };
 
+uint8_t lambdaChar[] = {
+  B00000,
+  B11000,
+  B00100,
+  B00100,
+  B01010,
+  B01010,
+  B10001,
+  B10001
+};
   
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
@@ -124,6 +134,7 @@ void setup()
   lcd.createChar(3, three);
   lcd.createChar(4, four);
   lcd.createChar(5, five);
+  lcd.createChar(6, lambdaChar);
   lcd.home();
   lcd.setCursor(0,0);
   lcd.print("starting..        ");
@@ -178,8 +189,11 @@ void loop()
     lcd.setCursor(0,3);
     lcd.print(RPM);
     lcd.print("    ");
-    lcd.setCursor(6,3);
-    lcd.print("RPM");
+    lcd.setCursor(5,3);
+    lcd.print("RPM ");
+    lcd.print((float)Lambda/1000, 2);
+    lcd.print(" ");
+    lcd.write(6);
   }
 
    // Execute task 1 every 100ms
@@ -252,7 +266,7 @@ void SendDPIValues()
   
   //add/remove the /* from the following row to enable or disable button debug squares from bottom right of screen
   
-  lcd.setCursor(15,3);
+  lcd.setCursor(16,3);
   lcd.write(DPI0in > 0 ? 5 : 0);
   lcd.write(DPI1in > 0 ? 5 : 0);
   lcd.write(DPI2in > 0 ? 5 : 0);
