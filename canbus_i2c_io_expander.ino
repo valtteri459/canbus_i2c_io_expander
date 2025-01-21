@@ -81,7 +81,7 @@ unsigned char rxBuf[8];
 #define BTN2 6
 #define BTN3 5
 
-#define DEBOUNCE_LOOPS 50
+#define DEBOUNCE_LOOPS 64
 //if input is high, these are always set to value defined in DEBOUNCE_LOOPS, and when input is low they will slowly decay to 0 = off
 
 unsigned int DPI0in = 0;                   // storage for digital input value as number for debounce purposes
@@ -92,7 +92,7 @@ unsigned int DPI3in = 0;                   // storage for digital input value as
 MCP_CAN CAN0(10);
 
 int Lambda;
-int BoostPressure;
+int MAP;
 int IntakeTemp;
 int CoolantTemp;
 int RPM;
@@ -160,21 +160,21 @@ void loop()
     lcd.setCursor(12,1);
     lcd.print("Oil P.");
     lcd.setCursor(12,2);
-    lcd.print("E. Cont");
+    lcd.print("MAP");
 
 
     lcd.setCursor(0,0);
     lcd.print(((float)IntakeTemp/10), 1);
     lcd.print("   ");
-    updateProgressBar(IntakeTemp, 1000, 0, 5, 5);
+    updateProgressBar(IntakeTemp+500, 1500, 0, 5, 5);
     lcd.setCursor(0,1);
     lcd.print(OilPressure/10);
     lcd.print("    ");
     updateProgressBar(OilPressure, 700, 1, 5, 5);
     lcd.setCursor(0,2);
-    lcd.print(((float)EthanolContent/10), 1);
+    lcd.print(((float)MAP/10), 1);
     lcd.print("%   ");
-    updateProgressBar(EthanolContent, 1000, 2, 5, 5);
+    updateProgressBar(MAP, 2400, 2, 5, 5);
     lcd.setCursor(0,3);
     lcd.print(RPM);
     lcd.print("    ");
@@ -222,7 +222,7 @@ void canRead() {
   } else if (rxId == 0x537) {
     FuelPressure = ((int)rxBuf[1] << 8) | rxBuf[0]; //scale 10x
   } else if (rxId == 0x520) {
-    BoostPressure = ((int)rxBuf[5] << 8) | rxBuf[4]; //scale 10x
+    MAP = ((int)rxBuf[5] << 8) | rxBuf[4]; //scale 10x
     Lambda = ((int)rxBuf[7] << 8) | rxBuf[6]; //scale 1000x
     RPM = ((int)rxBuf[1] << 8) | rxBuf[0];
   } else if (rxId == 0x536) {
