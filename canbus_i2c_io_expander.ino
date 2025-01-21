@@ -173,7 +173,7 @@ void loop()
     updateProgressBar(OilPressure, 700, 1, 5, 5);
     lcd.setCursor(0,2);
     lcd.print(((float)MAP/10), 1);
-    lcd.print("%   ");
+    lcd.print("   ");
     updateProgressBar(MAP, 2400, 2, 5, 5);
     lcd.setCursor(0,3);
     lcd.print(RPM);
