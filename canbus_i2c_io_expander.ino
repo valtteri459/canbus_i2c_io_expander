@@ -111,6 +111,9 @@ int EthanolContent;
 int TEMP;
 int Volt;
 int FuelPressure;
+bool CruiseState;
+int VehicleSpeed;
+int LockedCruiseSpeed;
 
 unsigned long task0Interval = 1000; // 1s interval for screen updates
 unsigned long task1Interval = 100; // 100ms interval for keep alive frame
@@ -166,34 +169,7 @@ void loop()
   
   if(currentMillis - task0Millis >= task0Interval) {
     task0Millis = currentMillis;
-    lcd.setCursor(12,0);
-    lcd.print("IAT");
-    lcd.setCursor(12,1);
-    lcd.print("Oil P.");
-    lcd.setCursor(12,2);
-    lcd.print("MAP");
-
-
-    lcd.setCursor(0,0);
-    lcd.print(((float)IntakeTemp/10), 1);
-    lcd.print("   ");
-    updateProgressBar(IntakeTemp+500, 1500, 0, 5, 5);
-    lcd.setCursor(0,1);
-    lcd.print(OilPressure/10);
-    lcd.print("    ");
-    updateProgressBar(OilPressure, 700, 1, 5, 5);
-    lcd.setCursor(0,2);
-    lcd.print(((float)MAP/10), 1);
-    lcd.print("   ");
-    updateProgressBar(MAP, 2400, 2, 5, 5);
-    lcd.setCursor(0,3);
-    lcd.print(RPM);
-    lcd.print("    ");
-    lcd.setCursor(5,3);
-    lcd.print("RPM ");
-    lcd.print((float)Lambda/1000, 2);
-    lcd.print(" ");
-    lcd.write(6);
+    updateScreen();
   }
 
    // Execute task 1 every 100ms
@@ -222,6 +198,46 @@ void loop()
   }
 }
 
+void updateScreen() {
+  lcd.setCursor(12,0);
+  lcd.print("IAT");
+  lcd.setCursor(12,1);
+  lcd.print("Oil P.");
+  lcd.setCursor(12,2);
+  lcd.print("MAP");
+
+
+  lcd.setCursor(0,0);
+  lcd.print(((float)IntakeTemp/10), 1);
+  lcd.print("   ");
+  updateProgressBar(IntakeTemp+500, 1500, 0, 5, 5);
+  lcd.setCursor(0,1);
+  lcd.print(OilPressure/10);
+  lcd.print("    ");
+  updateProgressBar(OilPressure, 700, 1, 5, 5);
+  lcd.setCursor(0,2);
+  lcd.print(((float)MAP/10), 1);
+  lcd.print("   ");
+  updateProgressBar(MAP, 2400, 2, 5, 5);
+  lcd.setCursor(0,3);
+  lcd.print(RPM);
+  lcd.print("    ");
+  lcd.setCursor(5,3);
+  lcd.print("RPM ");
+  lcd.print((float)Lambda/1000, 2);
+  lcd.print(" ");
+  lcd.write(6);
+  
+  lcd.setCursor(17,2);
+  lcd.print((int)VehicleSpeed/10);
+  lcd.setCursor(17,3);
+  if(LockedCruiseSpeed > 200) { //dont show values under 20kph
+    lcd.print((int)LockedCruiseSpeed/10);
+  } else {
+    lcd.print("   ");
+  }
+}
+
 void canRead() {
  if (rxId == 0x530) { //0x530
     //Volt
@@ -243,6 +259,10 @@ void canRead() {
     OilPressure = ((int)rxBuf[5] << 8) | rxBuf[4]; //scale 10x
   } else if (rxId == 0x531) {
     EthanolContent =((int)rxBuf[3] << 8) | rxBuf[2]; //scale 10x
+  } else if (rxId == 0x7B) {
+    CruiseState = rxBuf[4];
+    VehicleSpeed = ((int)rxBuf[1] << 8) | rxBuf[0]; 
+    LockedCruiseSpeed =((int)rxBuf[3] << 8) | rxBuf[2];
   }
 }
 
@@ -266,7 +286,7 @@ void SendDPIValues()
   
   //add/remove the /* from the following row to enable or disable button debug squares from bottom right of screen
   
-  lcd.setCursor(16,3);
+  lcd.setCursor(16,0);
   lcd.write(DPI0in > 0 ? 5 : 0);
   lcd.write(DPI1in > 0 ? 5 : 0);
   lcd.write(DPI2in > 0 ? 5 : 0);
