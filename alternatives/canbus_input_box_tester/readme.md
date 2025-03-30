@@ -1,0 +1,1 @@
+this simple script can be loaded to another arduino+mcp2515 combo to test the input box functionality and monitor canbus
