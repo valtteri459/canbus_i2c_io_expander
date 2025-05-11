@@ -1,0 +1,1 @@
+this is code for the generic I/O box without screen or LEDs, 8 pullup inputs and 4x 2n5551 driven low driving outputs
