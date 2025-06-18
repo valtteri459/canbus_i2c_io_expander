@@ -114,6 +114,11 @@ int FuelPressure;
 bool CruiseState;
 int VehicleSpeed;
 int LockedCruiseSpeed;
+int FuelFlow;
+int FuelFlowAvg;
+int FuelConsumption;
+int FuelConsumptionAvg;
+int EngineBayLidState;
 
 unsigned long task0Interval = 1000; // 1s interval for screen updates
 unsigned long task1Interval = 100; // 100ms interval for keep alive frame
@@ -125,6 +130,9 @@ unsigned long task1Millis = 0;     // storage for millis counter
 unsigned long task2Millis = 0;     // storage for millis counter
 unsigned long task3Millis = 0;     // storage for millis counter
 unsigned long task4Millis = 0;     // storage for millis counter
+
+char cruiseStates[7];
+char chrstring4[4];
 
 void setup()
 {
@@ -220,22 +228,39 @@ void updateScreen() {
   lcd.print("   ");
   updateProgressBar(MAP, 2400, 2, 5, 5);
   lcd.setCursor(0,3);
-  lcd.print(RPM);
-  lcd.print("    ");
-  lcd.setCursor(5,3);
-  lcd.print("RPM ");
+  sprintf(chrstring4, "%4i", RPM);
+  lcd.print(chrstring4);
+  lcd.print("RPM");
   lcd.print((float)Lambda/1000, 2);
-  lcd.print(" ");
   lcd.write(6);
-  
-  lcd.setCursor(17,2);
-  lcd.print((int)VehicleSpeed/10);
+  lcd.print(" ");
+  if(CruiseState > 0) {
+    sprintf(cruiseStates,
+      "%i%s%i", 
+      ((int)LockedCruiseSpeed/10),
+      LockedCruiseSpeed > VehicleSpeed ? "-" : "+",
+      abs((int)(VehicleSpeed-LockedCruiseSpeed)/10)
+    );
+    lcd.print(cruiseStates);
+  } else {
+    lcd.print("       ");
+  }
+  lcd.setCursor(16,2);
+  dtostrf((float)FuelConsumption/10, 4, 1, chrstring4);
+  //sprintf(chrstring4, "%2.1f", (float)FuelFlow/10);
+  lcd.print(chrstring4);
+  lcd.setCursor(19,1);
+  lcd.print(EngineBayLidState > 1 ? "X" : " ");
+  /*
+  //lcd.setCursor(17,2);
+  //lcd.print((int)VehicleSpeed/10);
   lcd.setCursor(17,3);
-  if(LockedCruiseSpeed > 200) { //dont show values under 20kph
+  if( > 200) { //dont show values under 20kph
+  
     lcd.print((int)LockedCruiseSpeed/10);
   } else {
     lcd.print("   ");
-  }
+  }*/
 }
 
 void canRead() {
@@ -260,9 +285,16 @@ void canRead() {
   } else if (rxId == 0x531) {
     EthanolContent =((int)rxBuf[3] << 8) | rxBuf[2]; //scale 10x
   } else if (rxId == 0x7B) {
-    CruiseState = rxBuf[4];
+    CruiseState = ((int)rxBuf[5] << 8) | rxBuf[4];
     VehicleSpeed = ((int)rxBuf[1] << 8) | rxBuf[0]; 
     LockedCruiseSpeed =((int)rxBuf[3] << 8) | rxBuf[2];
+  } else if (rxId == 0x7C) {
+    FuelFlow = ((int)rxBuf[1] << 8) | rxBuf[0];
+    FuelFlowAvg = ((int)rxBuf[3] << 8) | rxBuf[2];
+    FuelConsumption = ((int)rxBuf[5] << 8) | rxBuf[4];
+    FuelConsumptionAvg = ((int)rxBuf[7] << 8) | rxBuf[6];
+  } else if (rxId == 0x7D) {
+    EngineBayLidState = ((int)rxBuf[1] << 8) | rxBuf[0];
   }
 }
 
