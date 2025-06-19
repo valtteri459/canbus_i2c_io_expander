@@ -243,7 +243,8 @@ void updateScreen() {
     );
     lcd.print(cruiseStates);
   } else {
-    lcd.print("       ");
+    sprintf(cruiseStates,"%i",(int)VehicleSpeed/10);
+    lcd.print(cruiseStates);
   }
   lcd.setCursor(16,2);
   dtostrf((float)FuelConsumption/10, 4, 1, chrstring4);
