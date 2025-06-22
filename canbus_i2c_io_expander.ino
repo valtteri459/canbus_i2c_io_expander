@@ -131,7 +131,7 @@ unsigned long task2Millis = 0;     // storage for millis counter
 unsigned long task3Millis = 0;     // storage for millis counter
 unsigned long task4Millis = 0;     // storage for millis counter
 
-char cruiseStates[7];
+char cruiseStates[6];
 char chrstring4[4];
 
 void setup()
@@ -233,17 +233,17 @@ void updateScreen() {
   lcd.print("RPM");
   lcd.print((float)Lambda/1000, 2);
   lcd.write(6);
-  lcd.print(" ");
+  lcd.print("  ");
   if(CruiseState > 0) {
     sprintf(cruiseStates,
-      "%i%s%i", 
+      "%3i%1s%2i", 
       ((int)LockedCruiseSpeed/10),
       LockedCruiseSpeed > VehicleSpeed ? "-" : "+",
       abs((int)(VehicleSpeed-LockedCruiseSpeed)/10)
     );
     lcd.print(cruiseStates);
   } else {
-    sprintf(cruiseStates,"%i",(int)VehicleSpeed/10);
+    sprintf(cruiseStates,"%3i   ",(int)VehicleSpeed/10);
     lcd.print(cruiseStates);
   }
   lcd.setCursor(16,2);
